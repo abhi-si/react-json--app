@@ -1,12 +1,8 @@
 import { useForm, useFieldArray, FormProvider } from "react-hook-form";
 import { FieldRow } from "./FieldRow";
+import type { SchemaField } from './types'; // or wherever you declared it
 
-type SchemaField = {
-  name: string;
-  type: string;
-  toggle: boolean;
-  fields?: SchemaField[];
-};
+
 
 export function SchemaBuilder() {
   const formUtils = useForm<{ fields: SchemaField[] }>({

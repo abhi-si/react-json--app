@@ -4,6 +4,7 @@ import { useFormContext, useFieldArray, Controller } from "react-hook-form";
 interface FieldRowProps {
   registerName: string;
   remove: () => void;
+  nestIndex?: number;
 }
 
 export const FieldRow: React.FC<FieldRowProps> = ({ registerName, remove }) => {
