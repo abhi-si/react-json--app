@@ -1,13 +1,16 @@
-import React from "react";
+
 import { useForm, useFieldArray, FormProvider } from "react-hook-form";
 import { FieldRow } from "./FieldRow";
 
-type SchemaField = {
+// Avoid recursive typing in useForm — define a simplified version
+export type FieldType = "" | "string" | "number" | "nested";
+
+export interface SchemaField {
   name: string;
-  type: "string" | "number" | "nested";
+  type: FieldType;
   toggle: boolean;
-  fields?: SchemaField[];
-};
+  fields?: any[];
+}
 
 export function SchemaBuilder() {
   const methods = useForm<{ fields: SchemaField[] }>({
@@ -21,44 +24,45 @@ export function SchemaBuilder() {
   });
 
   const handleAddField = () => {
-    append({ name: "", type: "", toggle: false, fields: [] });
-  };
-
-  const handleFormSubmit = (data: { fields: SchemaField[] }) => {
-    console.log("Form Submitted:", data);
-  };
-
-  const createJson = (items: SchemaField[]): Record<string, any> => {
-    const result: Record<string, any> = {};
-    items.forEach((field) => {
-      if (!field.name) return;
-      if (field.type === "nested" && field.fields) {
-        result[field.name] = createJson(field.fields);
-      } else {
-        result[field.name] = field.type.toUpperCase();
-      }
+    append({
+      name: "",
+      type: "",
+      toggle: false,
+      fields: [],
     });
-    return result;
   };
 
-  const jsonPreview = createJson(watch("fields") || []);
+  const onSubmit = (data: { fields: SchemaField[] }) => {
+    console.log("Submitted data", data);
+  };
+
+  const buildJson = (entries: SchemaField[]): Record<string, any> => {
+    const json: Record<string, any> = {};
+    for (const field of entries) {
+      if (!field.name) continue;
+      if (field.type === "nested") {
+        json[field.name] = buildJson(field.fields || []);
+      } else {
+        json[field.name] = field.type.toUpperCase();
+      }
+    }
+    return json;
+  };
+
+  const previewJson = buildJson(watch("fields") || []);
 
   return (
     <FormProvider {...methods}>
-      <form
-        onSubmit={handleSubmit(handleFormSubmit)}
-        className="flex gap-6 p-6"
-      >
+      <form onSubmit={handleSubmit(onSubmit)} className="flex gap-8 p-6">
         <div className="w-1/2 space-y-4">
-          {fields.map((item, idx) => (
+          {fields.map((field, index) => (
             <FieldRow
-              key={item.id}
-              registerName={`fields.${idx}`}
-              remove={() => remove(idx)}
+              key={field.id}
+              registerName={`fields.${index}`}
+              remove={() => remove(index)}
             />
           ))}
-
-          <div className="flex flex-col gap-3 pt-2">
+          <div className="flex flex-col gap-2 pt-2">
             <button
               type="button"
               onClick={handleAddField}
@@ -66,7 +70,6 @@ export function SchemaBuilder() {
             >
               + Add Item
             </button>
-
             <button
               type="submit"
               className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
@@ -76,11 +79,11 @@ export function SchemaBuilder() {
           </div>
         </div>
 
-        <div className="w-1/2 bg-gray-100 rounded p-4 min-h-[200px]">
+        <div className="w-1/2 bg-gray-100 p-4 rounded min-h-[200px]">
           <h2 className="text-lg font-semibold mb-2">JSON Preview</h2>
           <pre className="text-sm whitespace-pre-wrap">
-            {Object.keys(jsonPreview).length > 0
-              ? JSON.stringify(jsonPreview, null, 2)
+            {Object.keys(previewJson).length > 0
+              ? JSON.stringify(previewJson, null, 2)
               : ""}
           </pre>
         </div>
