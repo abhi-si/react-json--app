@@ -4,25 +4,24 @@ import { useFormContext, useFieldArray, Controller } from "react-hook-form";
 interface FieldRowProps {
   registerName: string;
   remove: () => void;
-  nestIndex?: number;
 }
 
 export const FieldRow: React.FC<FieldRowProps> = ({ registerName, remove }) => {
   const { control, register, watch } = useFormContext();
   const type = watch(`${registerName}.type`);
-  // const toggleValue = watch(`${registerName}.toggle`);
 
-  const {
-    fields,
-    append,
-    remove: removeNested,
-  } = useFieldArray({
+  const nestedFieldArray = useFieldArray({
     control,
     name: `${registerName}.fields`,
   });
 
-  const addNestedField = () => {
-    append({ name: "", type: "", toggle: false, fields: [] });
+  const handleAddNested = () => {
+    nestedFieldArray.append({
+      name: "",
+      type: "",
+      toggle: false,
+      fields: [],
+    });
   };
 
   return (
@@ -75,17 +74,17 @@ export const FieldRow: React.FC<FieldRowProps> = ({ registerName, remove }) => {
 
       {type === "nested" && (
         <div className="ml-4 mt-3">
-          {fields.map((field, idx) => (
+          {nestedFieldArray.fields.map((subField, i) => (
             <FieldRow
-              key={field.id}
-              registerName={`${registerName}.fields.${idx}`}
-              remove={() => removeNested(idx)}
+              key={subField.id}
+              registerName={`${registerName}.fields.${i}`}
+              remove={() => nestedFieldArray.remove(i)}
             />
           ))}
           <button
             type="button"
-            onClick={addNestedField}
-            className="bg-blue-100 text-blue-700 font-medium py-2 px-4 rounded-md hover:bg-blue-200 transition text-sm mt-2"
+            onClick={handleAddNested}
+            className="mt-2 px-4 py-1 bg-blue-500 text-white text-sm rounded hover:bg-blue-600"
           >
             + Add Item
           </button>
