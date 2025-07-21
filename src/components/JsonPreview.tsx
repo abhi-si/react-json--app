@@ -1,5 +1,5 @@
-// src/components/JsonPreview.tsx
-import React from "react";
+
+
 
 export const JsonPreview = ({ data }: { data: any }) => {
   return (

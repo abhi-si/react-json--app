@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { SchemaBuilder }  from './components/SchemaBuilder';
 import { Toaster } from './components/ui/sonner';
 

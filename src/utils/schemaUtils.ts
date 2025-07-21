@@ -1,4 +1,4 @@
-import { SchemaField, JSONSchema, JSONSchemaProperty } from '@/types/schema';
+import { SchemaField} from '@/types/schema';
 
 export const generateId = (): string => {
   return Math.random().toString(36).substr(2, 9);

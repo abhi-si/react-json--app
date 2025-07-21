@@ -9,7 +9,7 @@ interface FieldRowProps {
 export const FieldRow: React.FC<FieldRowProps> = ({ registerName, remove }) => {
   const { control, register, watch } = useFormContext();
   const type = watch(`${registerName}.type`);
-  const toggleValue = watch(`${registerName}.toggle`);
+  // const toggleValue = watch(`${registerName}.toggle`);
 
   const {
     fields,
